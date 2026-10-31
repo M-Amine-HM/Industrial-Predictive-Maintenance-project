@@ -1,0 +1,42 @@
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---------- Jupyter ----------
+.ipynb_checkpoints/
+catboost_info/
+
+# ---------- Node / Vite ----------
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+*.tsbuildinfo
+
+# ---------- Environment & secrets ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Editors / OS ----------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Project ----------
+# Trained models (~13 MB), figures and the dataset are committed on purpose so the
+# API and dashboard work right after cloning. Uncomment to stop tracking them:
+# models/*.joblib
+# reports/figures/
+# data/
