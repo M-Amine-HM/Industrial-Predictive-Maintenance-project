@@ -1,0 +1,14 @@
+pandas>=2.2
+numpy>=1.26
+scikit-learn==1.7.2
+xgboost==3.4.1
+lightgbm==4.6.0  # 4.7.0 crashes inside Jupyter kernels on Windows (set_label access violation)
+imbalanced-learn==0.14.2
+optuna==5.0.0
+shap==0.54.1
+scipy
+matplotlib==3.10.8
+seaborn==0.13.2
+joblib
+jupyter
+nbconvert
