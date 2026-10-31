@@ -1,0 +1,49 @@
+{
+  "classes": [
+    "No Failure",
+    "TWF",
+    "HDF",
+    "PWF",
+    "OSF"
+  ],
+  "threshold": 0.66,
+  "fdr_target": 0.02,
+  "twf_advisory_wear_min": 200,
+  "features": [
+    "air_temp",
+    "process_temp",
+    "rpm",
+    "torque",
+    "tool_wear",
+    "temp_diff",
+    "power_W",
+    "wear_x_torque",
+    "osf_margin",
+    "power_margin_low",
+    "power_margin_high",
+    "hdf_temp_margin",
+    "hdf_rpm_margin",
+    "tool_wear_margin",
+    "type_ord"
+  ],
+  "rul_features": [
+    "air_temp",
+    "process_temp",
+    "rpm",
+    "torque",
+    "tool_wear",
+    "type_ord"
+  ],
+  "lgbm_params": {
+    "n_estimators": 600,
+    "learning_rate": 0.011492999300221412,
+    "num_leaves": 41,
+    "min_child_samples": 9,
+    "subsample": 0.6260206371941118,
+    "colsample_bytree": 0.9744427686266666,
+    "reg_lambda": 7.2866537374910445,
+    "subsample_freq": 1,
+    "random_state": 42,
+    "verbose": -1
+  }
+}
