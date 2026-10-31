@@ -1,0 +1,29 @@
+name: predictive-maintenance
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: runtime
+    image: predictive-maintenance-api:latest
+    ports:
+      - "8000:8000"
+    environment:
+      PM_LOG_LEVEL: INFO
+      PM_WORKERS: ${PM_WORKERS:-4}
+      PM_CORS_ORIGINS: http://localhost:8080
+      PM_RATE_LIMIT_PER_MIN: ${PM_RATE_LIMIT_PER_MIN:-0}
+      PM_API_KEY: ${PM_API_KEY:-}
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+    image: predictive-maintenance-web:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped

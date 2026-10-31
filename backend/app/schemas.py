@@ -4,10 +4,16 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class SensorReading(BaseModel):
-    """One machine snapshot, using the AI4I column names (aliases) or snake_case."""
-    model_config = ConfigDict(populate_by_name=True, json_schema_extra={"example": {
-        "type": "M", "air_temperature": 298.1, "process_temperature": 308.6,
-        "rotational_speed": 1551, "torque": 42.8, "tool_wear": 10}})
+    """One machine snapshot, using the AI4I column names (aliases) or snake_case.
+
+    Strict mode: text in a numeric field (even "42") is rejected rather than coerced,
+    as are NaN/Infinity and unknown fields.
+    """
+    model_config = ConfigDict(
+        populate_by_name=True, strict=True, extra="forbid", allow_inf_nan=False,
+        json_schema_extra={"example": {
+            "type": "M", "air_temperature": 298.1, "process_temperature": 308.6,
+            "rotational_speed": 1551, "torque": 42.8, "tool_wear": 10}})
 
     type: Literal["L", "M", "H"] = Field(alias="Type", description="Product quality variant")
     air_temperature: float = Field(alias="Air temperature", ge=250, le=350, description="K")
@@ -66,3 +72,31 @@ class BatchResponse(BaseModel):
     n_advisories: int
     by_failure: dict[str, int]
     rows: list[BatchRow]
+
+
+class ErrorDetail(BaseModel):
+    field: str
+    message: str
+    row: int | None = None
+
+
+class ErrorResponse(BaseModel):
+    error: str
+    message: str
+    details: list[ErrorDetail] = []
+    request_id: str | None = None
+
+
+class SensorDrift(BaseModel):
+    sensor: str
+    psi: float
+    status: Literal["stable", "moderate", "significant"]
+    reference_mean: float
+    current_mean: float
+
+
+class DriftResponse(BaseModel):
+    status: Literal["insufficient_data", "stable", "moderate", "significant"]
+    n_samples: int
+    min_samples: int
+    sensors: list[SensorDrift] = []

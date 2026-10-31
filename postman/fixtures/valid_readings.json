@@ -1,0 +1,6 @@
+{
+  "readings": [
+    {"Type": "M", "Air temperature": 298.1, "Process temperature": 308.6, "Rotational speed": 1551, "Torque": 42.8, "Tool wear": 10},
+    {"Type": "L", "Air temperature": 302.5, "Process temperature": 310.4, "Rotational speed": 1300, "Torque": 55.0, "Tool wear": 80}
+  ]
+}

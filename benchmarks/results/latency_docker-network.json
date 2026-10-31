@@ -1,0 +1,46 @@
+{
+  "label": "docker-network",
+  "url": "http://api:8000",
+  "model_version": "1",
+  "timestamp": "2026-10-31T22:17:27+00:00",
+  "client": {
+    "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "cpus": 12,
+    "python": "3.12.16"
+  },
+  "results": [
+    {
+      "scenario": "single /api/predict (no SHAP)",
+      "requests": 500,
+      "concurrency": 1,
+      "p50_ms": 13.13,
+      "p95_ms": 19.65,
+      "p99_ms": 25.08,
+      "mean_ms": 13.9,
+      "throughput_rps": 71.9,
+      "rows_per_s": 72.0
+    },
+    {
+      "scenario": "single /api/predict (with SHAP)",
+      "requests": 250,
+      "concurrency": 1,
+      "p50_ms": 19.8,
+      "p95_ms": 25.13,
+      "p99_ms": 32.8,
+      "mean_ms": 20.47,
+      "throughput_rps": 48.8,
+      "rows_per_s": 49.0
+    },
+    {
+      "scenario": "batch 1,000 rows /api/predict/batch",
+      "requests": 20,
+      "concurrency": 1,
+      "p50_ms": 164.47,
+      "p95_ms": 303.09,
+      "p99_ms": 321.96,
+      "mean_ms": 182.98,
+      "throughput_rps": 5.5,
+      "rows_per_s": 5465.0
+    }
+  ]
+}

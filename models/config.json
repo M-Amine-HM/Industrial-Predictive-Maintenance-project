@@ -45,5 +45,15 @@
     "subsample_freq": 1,
     "random_state": 42,
     "verbose": -1
+  },
+  "model_version": "1",
+  "mlflow": {
+    "experiment": "ai4i-predictive-maintenance",
+    "parent_run_id": "a0d2e592497145c48c3405b086e3e446",
+    "run_id": "9ec29dbc93b944fe9fcbcb202c876d8d",
+    "registered_model": "pm-failure-classifier",
+    "registered_version": "1",
+    "rul_registered_version": "1",
+    "data_sha256": "9b01f38d2d2b"
   }
 }

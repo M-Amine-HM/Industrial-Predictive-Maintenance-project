@@ -59,7 +59,31 @@ export interface BatchResponse {
   rows: BatchRow[];
 }
 
+export interface ErrorDetail {
+  field: string;
+  message: string;
+  row?: number | null;
+}
+
+export interface SensorDrift {
+  sensor: string;
+  psi: number;
+  status: "stable" | "moderate" | "significant";
+  reference_mean: number;
+  current_mean: number;
+}
+
+export interface DriftResponse {
+  status: "insufficient_data" | "stable" | "moderate" | "significant";
+  n_samples: number;
+  min_samples: number;
+  sensors: SensorDrift[];
+}
+
 export interface ModelInfo {
+  model_version: string;
+  mlflow: { run_id?: string; registered_model?: string; registered_version?: string; experiment?: string };
+  limits: { max_batch_rows: number; max_upload_mb: number };
   classes: string[];
   threshold: number;
   fdr_target: number;

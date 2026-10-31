@@ -1,0 +1,14 @@
+# Render Blueprint: New > Blueprint > pick this repo. Free plan, single container (API + dashboard).
+services:
+  - type: web
+    name: predictive-maintenance
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: PM_RATE_LIMIT_PER_MIN
+        value: "300"
+      - key: PM_LOG_LEVEL
+        value: INFO

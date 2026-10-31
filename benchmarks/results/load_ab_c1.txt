@@ -1,0 +1,8 @@
+# /api/predict?explain=false | concurrency=1 | requests=1000 | api workers=4 | 2026-10-31T22:17Z
+Complete requests:      1000
+Failed requests:        0
+Requests per second:    64.59 [#/sec] (mean)
+Time per request:       15.483 [ms] (mean)
+  50%     13
+  95%     27
+  99%     46

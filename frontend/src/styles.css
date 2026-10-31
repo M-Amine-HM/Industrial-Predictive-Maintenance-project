@@ -254,6 +254,12 @@ tr:last-child td { border-bottom: 0; }
 .lightbox img { max-width: 100%; max-height: 88vh; border-radius: 8px; background: #fcfcfb; }
 .lightbox p { color: #f0efec; text-align: center; margin: 10px 0 0; }
 
+.error-panel {
+  margin-top: 14px; padding: 14px 16px; border-radius: var(--radius); background: var(--surface);
+  border: 1px solid var(--border); border-left: 5px solid var(--critical);
+}
+.error-head { display: flex; align-items: center; gap: 10px; }
+.error-panel code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12px; }
 .error { color: var(--critical); background: color-mix(in srgb, var(--critical) 10%, transparent); padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; }
 .empty { color: var(--muted); text-align: center; padding: 40px 0; }
 .note { color: var(--ink-2); font-size: 12.5px; line-height: 1.5; }

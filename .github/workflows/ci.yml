@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt pytest httpx
+      - name: Run API tests
+        working-directory: backend
+        env:
+          PM_LOG_LEVEL: WARNING
+        run: python -m pytest -q
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - name: Type-check and build
+        run: npm run build
+        working-directory: frontend
+
+  docker-e2e:
+    needs: [backend-tests, frontend-build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build images
+        run: docker compose build
+      - name: Start stack
+        run: docker compose up -d --wait --wait-timeout 180
+      - name: Postman / Newman contract tests (via nginx)
+        run: >
+          npx --yes newman@6 run postman/predictive-maintenance.postman_collection.json
+          --env-var baseUrl=http://localhost:8080
+          --working-dir postman/fixtures
+          --reporters cli
+      - name: Latency benchmark (sequential)
+        run: |
+          pip install httpx
+          python benchmarks/latency.py --url http://localhost:8000 --label ci --n 300
+      - name: Load test (ApacheBench, 16 concurrent)
+        run: sh benchmarks/load_test.sh 16 2000
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmarks
+          path: benchmarks/results/
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Stop stack
+        if: always()
+        run: docker compose down

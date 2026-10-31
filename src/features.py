@@ -22,29 +22,30 @@ FAILURE_CLASSES = ["No Failure", "TWF", "HDF", "PWF", "OSF"]
 
 
 def build_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Return the model feature matrix built from the raw sensor columns."""
-    X = pd.DataFrame(index=df.index)
-    air, proc = df["Air temperature"], df["Process temperature"]
-    rpm, torque, wear = df["Rotational speed"], df["Torque"], df["Tool wear"]
+    """Return the model feature matrix built from the raw sensor columns.
 
-    X["air_temp"] = air
-    X["process_temp"] = proc
-    X["rpm"] = rpm
-    X["torque"] = torque
-    X["tool_wear"] = wear
+    Computed on NumPy arrays and assembled once: a single-row call stays well under
+    a millisecond, which matters for API latency.
+    """
+    air, proc = df["Air temperature"].to_numpy(), df["Process temperature"].to_numpy()
+    rpm, torque, wear = df["Rotational speed"].to_numpy(), df["Torque"].to_numpy(), df["Tool wear"].to_numpy()
+    type_ord = df["Type"].map({"L": 0, "M": 1, "H": 2}).to_numpy()
+    osf_limit = np.array([OSF_LIMIT["L"], OSF_LIMIT["M"], OSF_LIMIT["H"]], dtype=float)[type_ord]
 
     # Physics-informed features
-    X["temp_diff"] = proc - air
-    X["power_W"] = torque * rpm * 2 * np.pi / 60
-    X["wear_x_torque"] = wear * torque
-    osf_limit = df["Type"].map(OSF_LIMIT).astype(float)
-    X["osf_margin"] = osf_limit - X["wear_x_torque"]
-    X["power_margin_low"] = X["power_W"] - PWF_LOW
-    X["power_margin_high"] = PWF_HIGH - X["power_W"]
-    X["hdf_temp_margin"] = X["temp_diff"] - HDF_TEMP_DIFF
-    X["hdf_rpm_margin"] = rpm - HDF_RPM
-    X["tool_wear_margin"] = TWF_WEAR - wear
-
-    # Product quality variant (ordinal: L < M < H)
-    X["type_ord"] = df["Type"].map({"L": 0, "M": 1, "H": 2})
-    return X
+    temp_diff = proc - air
+    power = torque * rpm * 2 * np.pi / 60
+    strain = wear * torque
+    return pd.DataFrame({
+        "air_temp": air, "process_temp": proc, "rpm": rpm, "torque": torque, "tool_wear": wear,
+        "temp_diff": temp_diff,
+        "power_W": power,
+        "wear_x_torque": strain,
+        "osf_margin": osf_limit - strain,
+        "power_margin_low": power - PWF_LOW,
+        "power_margin_high": PWF_HIGH - power,
+        "hdf_temp_margin": temp_diff - HDF_TEMP_DIFF,
+        "hdf_rpm_margin": rpm - HDF_RPM,
+        "tool_wear_margin": TWF_WEAR - wear,
+        "type_ord": type_ord,   # product quality variant (ordinal: L < M < H)
+    }, index=df.index)

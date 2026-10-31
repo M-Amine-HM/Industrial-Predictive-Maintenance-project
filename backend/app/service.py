@@ -7,7 +7,7 @@ import shap
 
 from . import config  # noqa: F401  (puts src/ on sys.path)
 from features import (HDF_RPM, HDF_TEMP_DIFF, OSF_LIMIT, PWF_HIGH, PWF_LOW,
-                      RAW_COLUMNS, TWF_WEAR, build_features)
+                      TWF_WEAR, build_features)
 
 
 class ModelService:
@@ -21,6 +21,8 @@ class ModelService:
         self.classes = self.cfg["classes"]
         self.threshold = float(self.cfg["threshold"])
         self.explainer = shap.TreeExplainer(self.clf)
+        self.version = str(self.cfg.get("model_version", "1.0.0"))
+        self.lineage = self.cfg.get("mlflow", {})
 
     # ------------------------------------------------------------------ core
     def predict_frame(self, raw: pd.DataFrame) -> pd.DataFrame:
@@ -88,28 +90,3 @@ class ModelService:
              "utilisation": round(wear / TWF_WEAR, 3), "breached": bool(wear >= TWF_WEAR)},
         ]
 
-    # ---------------------------------------------------------------- batch
-    @staticmethod
-    def normalise_columns(df: pd.DataFrame) -> pd.DataFrame:
-        """Accept AI4I headers, snake_case, or AI4I headers with units like 'Torque [Nm]'."""
-        canon = {c.lower().replace(" ", "_"): c for c in RAW_COLUMNS}
-        rename = {}
-        for col in df.columns:
-            key = col.split("[")[0].strip().lower().replace(" ", "_")
-            if key in canon:
-                rename[col] = canon[key]
-        df = df.rename(columns=rename)
-        missing = [c for c in RAW_COLUMNS if c not in df.columns]
-        if missing:
-            raise ValueError(f"Missing columns: {missing}")
-        df = df[RAW_COLUMNS].copy()
-        df["Type"] = df["Type"].astype(str).str.strip().str.upper()
-        if not df["Type"].isin(OSF_LIMIT).all():
-            raise ValueError("Column 'Type' must only contain L, M or H")
-        num = RAW_COLUMNS[1:]
-        df[num] = df[num].apply(pd.to_numeric, errors="coerce")
-        if df[num].isna().any().any():
-            raise ValueError("Sensor columns contain missing or non-numeric values")
-        if (df["Rotational speed"] <= 0).any() or (df["Torque"] <= 0).any():
-            raise ValueError("Rotational speed and Torque must be positive")
-        return df

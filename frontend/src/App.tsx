@@ -54,7 +54,9 @@ export default function App() {
         <div className="topbar-right">
           <span className="conn">
             <span className="dot" style={{ background: online === null ? "var(--muted)" : online ? "var(--good)" : "var(--critical)" }} />
-            <span className="conn-label">{online === null ? "Connecting…" : online ? "Model online" : "API offline"}</span>
+            <span className="conn-label">
+              {online === null ? "Connecting…" : online ? `Model v${info?.model_version ?? "?"} online` : "API offline"}
+            </span>
           </span>
           <button className="icon-btn" aria-label="Toggle colour theme" onClick={() => setTheme(isDark ? "light" : "dark")}>
             {isDark ? "☀" : "☾"}
@@ -66,7 +68,7 @@ export default function App() {
           <div className="error">Cannot reach the API. Start it with <code>uvicorn app.main:app --port 8000</code> from the <code>backend/</code> folder.</div>
         )}
         {tab === "diagnose" && <DiagnosePanel info={info} />}
-        {tab === "fleet" && <FleetPanel />}
+        {tab === "fleet" && <FleetPanel info={info} />}
         {tab === "report" && <ReportPanel info={info} />}
       </main>
     </>
